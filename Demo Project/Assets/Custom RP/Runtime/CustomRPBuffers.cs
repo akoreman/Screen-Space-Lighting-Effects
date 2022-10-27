@@ -51,22 +51,13 @@ public class GeometryBuffer
 
         // Create the render targets, create the IDs and throw them together in an array.
         buffer.GetTemporaryRT(normalBufferId, camera.pixelWidth, camera.pixelHeight, 24, FilterMode.Point, RenderTextureFormat.ARGBFloat);
-        ExecuteBuffer();
-
         RenderTargetIdentifier normalBufferID = new RenderTargetIdentifier(normalBufferId);
-        ExecuteBuffer();
 
         buffer.GetTemporaryRT(albedoBufferId, camera.pixelWidth, camera.pixelHeight, 24, FilterMode.Point, RenderTextureFormat.ARGBFloat);
-        ExecuteBuffer();
-
         RenderTargetIdentifier albedoBufferID = new RenderTargetIdentifier(albedoBufferId);
-        ExecuteBuffer();
 
         buffer.GetTemporaryRT(worldPositionBufferId, camera.pixelWidth, camera.pixelHeight, 24, FilterMode.Point, RenderTextureFormat.ARGBFloat);
-        ExecuteBuffer();
-
         RenderTargetIdentifier worldPositionBufferID = new RenderTargetIdentifier(worldPositionBufferId);
-        ExecuteBuffer();
 
         mrt[0] = normalBufferID;
         mrt[1] = albedoBufferID;
@@ -76,11 +67,9 @@ public class GeometryBuffer
 
         // Create a render texture to use a the depth buffer.
         var depthBuffer = RenderTexture.GetTemporary(camera.pixelWidth, camera.pixelHeight, 24);
-
         buffer.SetRenderTarget(mrt, depthBuffer);
-        ExecuteBuffer();
-
         buffer.ClearRenderTarget(true, false, Color.clear);
+
         ExecuteBuffer();
 
         SortingSettings sortingSettings = new SortingSettings(camera);
@@ -88,13 +77,7 @@ public class GeometryBuffer
         FilteringSettings filteringSettings = new FilteringSettings(RenderQueueRange.all);
 
         context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
-
-        ExecuteBuffer();
         context.Submit();
-
-        buffer.ReleaseTemporaryRT(normalBufferId);
-        buffer.ReleaseTemporaryRT(albedoBufferId);
-        buffer.ReleaseTemporaryRT(worldPositionBufferId);
 
         ExecuteBuffer();
     }
@@ -102,6 +85,10 @@ public class GeometryBuffer
 
     public void Cleanup()
     {
+        buffer.ReleaseTemporaryRT(normalBufferId);
+        buffer.ReleaseTemporaryRT(albedoBufferId);
+        buffer.ReleaseTemporaryRT(worldPositionBufferId);
+
         ExecuteBuffer();
     }
 
