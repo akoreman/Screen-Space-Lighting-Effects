@@ -17,7 +17,7 @@ public class GeometryBuffer
     // Setup IDs for the appropriate render targets.
     static int normalBufferId = Shader.PropertyToID("_NormalBuffer");
     static int albedoBufferId = Shader.PropertyToID("_AlbedoBuffer");
-    static int worldPositionBufferId = Shader.PropertyToID("_worldPositionBuffer");
+    static int viewPositionBufferId = Shader.PropertyToID("_ViewPositionBuffer");
 
     static ShaderTagId geometryShaderTagId = new ShaderTagId("Geometry");
 
@@ -58,12 +58,12 @@ public class GeometryBuffer
         buffer.GetTemporaryRT(albedoBufferId, camera.pixelWidth, camera.pixelHeight, 24, FilterMode.Point, RenderTextureFormat.ARGBFloat);
         RenderTargetIdentifier albedoBufferID = new RenderTargetIdentifier(albedoBufferId);
 
-        buffer.GetTemporaryRT(worldPositionBufferId, camera.pixelWidth, camera.pixelHeight, 24, FilterMode.Point, RenderTextureFormat.ARGBFloat);
-        RenderTargetIdentifier worldPositionBufferID = new RenderTargetIdentifier(worldPositionBufferId);
+        buffer.GetTemporaryRT(viewPositionBufferId, camera.pixelWidth, camera.pixelHeight, 24, FilterMode.Point, RenderTextureFormat.ARGBFloat);
+        RenderTargetIdentifier viewPositionBufferID = new RenderTargetIdentifier(viewPositionBufferId);
 
         mrt[0] = normalBufferID;
         mrt[1] = albedoBufferID;
-        mrt[2] = worldPositionBufferID;
+        mrt[2] = viewPositionBufferID;
 
         ExecuteBuffer();
 
@@ -88,7 +88,7 @@ public class GeometryBuffer
     {
         buffer.ReleaseTemporaryRT(normalBufferId);
         buffer.ReleaseTemporaryRT(albedoBufferId);
-        buffer.ReleaseTemporaryRT(worldPositionBufferId);
+        buffer.ReleaseTemporaryRT(viewPositionBufferId);
         RenderTexture.ReleaseTemporary(depthBuffer);
 
         ExecuteBuffer();

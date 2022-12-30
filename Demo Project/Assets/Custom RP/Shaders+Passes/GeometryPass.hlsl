@@ -28,7 +28,7 @@ struct vertexInput
 struct vertexOutput
 {
     float4 positionClipSpace : SV_POSITION;
-    float3 positionWorldSpace : VAR_POSITION;
+    float3 positionViewSpace : VAR_POSITION;
     float3 normalWorldSpace : VAR_NORMAL;
     float2 coordsUV : TEXCOORD0;
     float4 tangentWorldSpace : VAR_TANGENT;
@@ -40,7 +40,7 @@ struct fragmentOutput
 {
     float4 normalBuffer : SV_TARGET0;
     float4 albedoBuffer : SV_TARGET1;
-    float4 worldPositionBuffer : SV_TARGET2;
+    float4 viewPositionBuffer : SV_TARGET2;
 };
 
 float3 GetNormalTS(float2 coordsUV)
@@ -59,13 +59,14 @@ vertexOutput NormalsPassVertex(vertexInput input)
    
 	// Transform from object space to world space.
     float3 positionWorldSpace = TransformObjectToWorld(input.positionObjectSpace);
+    float3 positionViewSpace = TransformWorldToView(positionWorldSpace);
 
 	// Transform from world space to clip space.
     output.positionClipSpace = TransformWorldToHClip(positionWorldSpace);
     output.normalWorldSpace = TransformObjectToWorldNormal(input.normalObjectSpace);
     output.coordsUV = input.coordsUV;
     
-    output.positionWorldSpace = positionWorldSpace;
+    output.positionViewSpace = positionViewSpace;
     
     output.tangentWorldSpace = float4(TransformObjectToWorldDir(input.tangentObjectSpace.xyz), input.tangentObjectSpace.w);
     
@@ -80,13 +81,12 @@ fragmentOutput NormalsPassFragment(vertexOutput input)
     
     output.normalBuffer = float4(normal, 1.0);
 
-    
     float4 textureSampleColor = SAMPLE_TEXTURE2D(_Texture, sampler_Texture, input.coordsUV);
     float4 baseColor = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseColor);
     
     output.albedoBuffer = textureSampleColor * baseColor;
     
-    output.worldPositionBuffer = float4(input.positionWorldSpace, 1.0);
+    output.viewPositionBuffer = float4(input.positionViewSpace, 1.0);
      
     return output;
 }
