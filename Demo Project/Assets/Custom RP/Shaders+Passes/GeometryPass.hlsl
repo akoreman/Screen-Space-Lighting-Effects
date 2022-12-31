@@ -51,9 +51,8 @@ float3 GetNormalTS(float2 coordsUV)
     return normal;
 }
 
-vertexOutput NormalsPassVertex(vertexInput input)
+vertexOutput GeometryPassVertex(vertexInput input)
 {
-    vertexOutput output;
     UNITY_SETUP_INSTANCE_ID(input);
     UNITY_TRANSFER_INSTANCE_ID(input, output);
    
@@ -62,30 +61,28 @@ vertexOutput NormalsPassVertex(vertexInput input)
     float3 positionViewSpace = TransformWorldToView(positionWorldSpace);
 
 	// Transform from world space to clip space.
+    vertexOutput output;
+
     output.positionClipSpace = TransformWorldToHClip(positionWorldSpace);
     output.normalWorldSpace = TransformObjectToWorldNormal(input.normalObjectSpace);
     output.coordsUV = input.coordsUV;
     
     output.positionViewSpace = positionViewSpace;
-    
     output.tangentWorldSpace = float4(TransformObjectToWorldDir(input.tangentObjectSpace.xyz), input.tangentObjectSpace.w);
     
     return output;
 }
 
-fragmentOutput NormalsPassFragment(vertexOutput input) 
+fragmentOutput GeometryPassFragment(vertexOutput input) 
 {
-    fragmentOutput output;
-    
     float3 normal = NormalTangentToWorld(GetNormalTS(input.coordsUV), input.normalWorldSpace, input.tangentWorldSpace);
-    
-    output.normalBuffer = float4(normal, 1.0);
-
     float4 textureSampleColor = SAMPLE_TEXTURE2D(_Texture, sampler_Texture, input.coordsUV);
     float4 baseColor = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial, _BaseColor);
     
+    fragmentOutput output;
+
+    output.normalBuffer = float4(normal, 1.0);
     output.albedoBuffer = textureSampleColor * baseColor;
-    
     output.viewPositionBuffer = float4(input.positionViewSpace, 1.0);
      
     return output;

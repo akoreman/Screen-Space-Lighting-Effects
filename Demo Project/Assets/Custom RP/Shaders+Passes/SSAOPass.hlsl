@@ -1,5 +1,5 @@
-#ifndef CUSTOM_LIT_PASS_INCLUDED
-#define CUSTOM_LIT_PASS_INCLUDED
+#ifndef CUSTOM_SSAO_PASS_INCLUDED
+#define CUSTOM_SSAO_PASS_INCLUDED
 
 #include "../Auxiliary/Common.hlsl"
 #include "../Auxiliary/Lighting.hlsl"
@@ -11,8 +11,8 @@ SAMPLER(sampler_NormalBuffer);
 TEXTURE2D(_AlbedoBuffer);
 SAMPLER(sampler_AlbedoBuffer);
 
-TEXTURE2D(_SSAOBuffer);
-SAMPLER(sampler__SSAOBuffer);
+TEXTURE2D(_ViewPositionBuffer);
+SAMPLER(sampler_ViewPositionBuffer);
 
 struct vertexInput {
 	float4 positionClipSpace : SV_POSITION;
@@ -20,7 +20,7 @@ struct vertexInput {
 };
 
 // Assign the correct clip-space coordinates and UV coordinates to the rendered triangle.
-vertexInput LitPassVertex (uint vertexID : SV_VertexID) {
+vertexInput SSAOPassVertex (uint vertexID : SV_VertexID) {
 	vertexInput output;
 
 	output.positionClipSpace = float4(
@@ -36,12 +36,14 @@ vertexInput LitPassVertex (uint vertexID : SV_VertexID) {
 	return output;
 }
 
-float4 LitPassFragment(vertexInput input) : SV_TARGET
+float4 SSAOPassFragment(vertexInput input) : SV_TARGET
 {
     float4 albedo = SAMPLE_TEXTURE2D(_AlbedoBuffer, sampler_AlbedoBuffer, input.coordsUV);
 	float4 color = float4(GetLighting(SAMPLE_TEXTURE2D(_NormalBuffer, sampler_NormalBuffer, input.coordsUV).xyz),1.0f);
 
-    return saturate(color * albedo);
+    return float4(1.0f, 0.0f, 1.0f, 1.0f);
+
+    //return saturate(color * albedo);
 }
 
 #endif

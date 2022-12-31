@@ -16,12 +16,26 @@ Shader "Custom RP/Deferred"
 				HLSLPROGRAM
 				#pragma target 5.0
 				#pragma multi_compile_instancing
-				#pragma vertex NormalsPassVertex
-				#pragma fragment NormalsPassFragment
+				#pragma vertex GeometryPassVertex
+				#pragma fragment GeometryPassFragment
 				#include "GeometryPass.hlsl"
 				ENDHLSL
 			}
+			
+			Pass {
+				Tags {
+					"LightMode" = "SSAO"
+				}
 
+				HLSLPROGRAM
+				#pragma target 5.0
+				#pragma multi_compile_instancing
+				#pragma vertex SSAOPassVertex
+				#pragma fragment SSAOPassFragment
+				#include "SSAOPass.hlsl"
+				ENDHLSL
+			}
+		
 			Pass {
 				Tags {
 					"LightMode" = "Lit"

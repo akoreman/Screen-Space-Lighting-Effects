@@ -6,7 +6,7 @@ using Unity.Collections;
 
 public class GeometryBuffer
 {
-    const string bufferName = "NormalBuffer";
+    const string bufferName = "GeometryBuffers";
 
     ScriptableRenderContext context;
     Camera camera;
@@ -47,8 +47,6 @@ public class GeometryBuffer
     public void Render()
     {
         context.SetupCameraProperties(camera);
-        buffer.ClearRenderTarget(true, true, Color.clear);
-
         ExecuteBuffer();
 
         // Create the render targets, create the IDs and throw them together in an array.
@@ -70,7 +68,7 @@ public class GeometryBuffer
         // Create a render texture to use as the depth buffer.
         depthBuffer = RenderTexture.GetTemporary(camera.pixelWidth, camera.pixelHeight, 24);
         buffer.SetRenderTarget(mrt, depthBuffer);
-        buffer.ClearRenderTarget(true, false, Color.clear);
+        buffer.ClearRenderTarget(true, true, Color.clear);
 
         ExecuteBuffer();
 
@@ -91,6 +89,70 @@ public class GeometryBuffer
         buffer.ReleaseTemporaryRT(viewPositionBufferId);
         RenderTexture.ReleaseTemporary(depthBuffer);
 
+        ExecuteBuffer();
+    }
+}
+
+public class SSAOBuffer
+{
+    ScriptableRenderContext context;
+    Camera camera;
+    Material material;
+
+    const string bufferName = "SSAOBuffers";
+    CommandBuffer buffer = new CommandBuffer {name = bufferName};
+
+    // Setup ID for the render target.
+    static int ssaoBufferId = Shader.PropertyToID("_SSAOBuffer");
+
+    public void Setup(ScriptableRenderContext context, Camera camera, Material material)
+    {
+        this.context = context;
+        this.camera = camera;
+        this.material = material;
+
+        Render();  
+        Submit();
+        Cleanup();
+    }
+
+    void Render()
+    {
+        // Create the render target.
+        buffer.GetTemporaryRT(ssaoBufferId, camera.pixelWidth, camera.pixelHeight, 24, FilterMode.Point, RenderTextureFormat.ARGBFloat);
+        RenderTargetIdentifier ssaoBufferID = new RenderTargetIdentifier(ssaoBufferId);
+
+        ExecuteBuffer();
+
+        buffer.SetRenderTarget(ssaoBufferID);
+        buffer.ClearRenderTarget(true, true, Color.clear);
+
+        ExecuteBuffer();
+
+        // Render a screen-space triangle using the lit pass of the deferred shader.
+        buffer.DrawProcedural(
+			Matrix4x4.identity, material, 2,
+			MeshTopology.Triangles, 3
+		);
+
+        ExecuteBuffer();
+    }
+
+    void Submit()
+    {
+        ExecuteBuffer();
+        context.Submit();
+    }
+
+    void ExecuteBuffer()
+    {
+        context.ExecuteCommandBuffer(buffer);
+        buffer.Clear();
+    }
+
+    void Cleanup()
+    {
+        buffer.ReleaseTemporaryRT(ssaoBufferId);
         ExecuteBuffer();
     }
 }

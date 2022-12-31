@@ -33,8 +33,7 @@ public class CamRenderer
     CullingResults cullingResults;
 
     GeometryBuffer geometryBuffer = new GeometryBuffer();
-
-    static ShaderTagId litShaderTagId = new ShaderTagId("Lit");
+    SSAOBuffer ssaoBuffer = new SSAOBuffer();
 
     const string bufferName = "Render Camera";
     CommandBuffer buffer = new CommandBuffer {name = bufferName};
@@ -66,6 +65,7 @@ public class CamRenderer
         ExecuteBuffer();
 
         geometryBuffer.Setup(context, cullingResults, camera);
+        ssaoBuffer.Setup(context, camera, material);
 
         ExecuteBuffer();
 
@@ -77,7 +77,7 @@ public class CamRenderer
     {
         // Render a screen-space triangle using the lit pass of the deferred shader.
         buffer.DrawProcedural(
-			Matrix4x4.identity, material, 1,
+			Matrix4x4.identity, material, 2,
 			MeshTopology.Triangles, 3
 		);
     }
@@ -100,7 +100,7 @@ public class CamRenderer
 
         if (camera.TryGetCullingParameters(out param))
         {
-            cullingResults = context.Cull(ref param);
+            this.cullingResults = context.Cull(ref param);
             return true;
         }
 
