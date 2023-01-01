@@ -3,7 +3,6 @@ using UnityEngine.Rendering;
 using Unity.Collections;
 
 // Class to setup the MRT and setup and render to the appropriate targets.
-
 public class GeometryBuffer
 {
     const string bufferName = "GeometryBuffers";
@@ -93,6 +92,7 @@ public class GeometryBuffer
     }
 }
 
+// Class to setup the buffer with the information needed for SSAO.
 public class SSAOBuffer
 {
     ScriptableRenderContext context;
@@ -124,18 +124,16 @@ public class SSAOBuffer
 
         ExecuteBuffer();
 
-        buffer.SetRenderTarget(ssaoBufferID);
+        buffer.SetRenderTarget(ssaoBufferID, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.DontCare);
         buffer.ClearRenderTarget(true, true, Color.clear);
 
         ExecuteBuffer();
 
-        // Render a screen-space triangle using the lit pass of the deferred shader.
+        // Render a screen-space triangle using the SSAO pass of the deferred shader.
         buffer.DrawProcedural(
-			Matrix4x4.identity, material, 2,
+			Matrix4x4.identity, material, 1,
 			MeshTopology.Triangles, 3
 		);
-
-        ExecuteBuffer();
     }
 
     void Submit()

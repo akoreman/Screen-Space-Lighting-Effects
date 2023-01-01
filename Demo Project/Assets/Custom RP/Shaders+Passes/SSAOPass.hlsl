@@ -16,7 +16,7 @@ SAMPLER(sampler_ViewPositionBuffer);
 
 struct vertexInput {
 	float4 positionClipSpace : SV_POSITION;
-	float2 coordsUV : VAR_SCREEN_UV;
+	float2 coordsUV : VAR_UV;
 };
 
 // Assign the correct clip-space coordinates and UV coordinates to the rendered triangle.
@@ -39,9 +39,9 @@ vertexInput SSAOPassVertex (uint vertexID : SV_VertexID) {
 float4 SSAOPassFragment(vertexInput input) : SV_TARGET
 {
     float4 albedo = SAMPLE_TEXTURE2D(_AlbedoBuffer, sampler_AlbedoBuffer, input.coordsUV);
-	float4 color = float4(GetLighting(SAMPLE_TEXTURE2D(_NormalBuffer, sampler_NormalBuffer, input.coordsUV).xyz),1.0f);
+	float4 color = float4(GetLighting(SAMPLE_TEXTURE2D(_NormalBuffer, sampler_NormalBuffer, input.coordsUV).xyz), 1.0f);
 
-    return float4(1.0f, 0.0f, 1.0f, 1.0f);
+    return float4(1.0f, 0.0f,0.0f, 1.0f);
 
     //return saturate(color * albedo);
 }
