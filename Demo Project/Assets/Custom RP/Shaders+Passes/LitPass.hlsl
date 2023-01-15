@@ -14,14 +14,14 @@ SAMPLER(sampler_AlbedoBuffer);
 TEXTURE2D(_SSAOBuffer);
 SAMPLER(sampler__SSAOBuffer);
 
-struct vertexInput {
+struct vertexOutput {
 	float4 positionClipSpace : SV_POSITION;
 	float2 coordsUV : VAR_SCREEN_UV;
 };
 
 // Assign the correct clip-space coordinates and UV coordinates to the rendered triangle.
-vertexInput LitPassVertex (uint vertexID : SV_VertexID) {
-	vertexInput output;
+vertexOutput LitPassVertex (uint vertexID : SV_VertexID) {
+	vertexOutput output;
 
 	output.positionClipSpace = float4(
 		vertexID <= 1 ? -1.0 : 3.0,
@@ -36,12 +36,13 @@ vertexInput LitPassVertex (uint vertexID : SV_VertexID) {
 	return output;
 }
 
-float4 LitPassFragment(vertexInput input) : SV_TARGET
+float4 LitPassFragment(vertexOutput input) : SV_TARGET
 {
     float4 albedo = SAMPLE_TEXTURE2D(_AlbedoBuffer, sampler_AlbedoBuffer, input.coordsUV);
+	float4 ssao = SAMPLE_TEXTURE2D(_SSAOBuffer, sampler__SSAOBuffer, input.coordsUV);
 	float4 color = float4(GetLighting(SAMPLE_TEXTURE2D(_NormalBuffer, sampler_NormalBuffer, input.coordsUV).xyz),1.0f);
 
-    return saturate(color * albedo);
+    return saturate(color * albedo) + ssao;
 }
 
 #endif

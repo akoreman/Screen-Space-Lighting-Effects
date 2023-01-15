@@ -67,7 +67,7 @@ public class CamRenderer
         geometryBuffer.Setup(context, cullingResults, camera);
         ssaoBuffer.Setup(context, camera, material);
 
-        buffer.SetRenderTarget(BuiltinRenderTextureType.CameraTarget, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.DontCare);
+        buffer.SetRenderTarget(BuiltinRenderTextureType.CameraTarget, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
         buffer.ClearRenderTarget(true, true, Color.clear);
 
         ExecuteBuffer();

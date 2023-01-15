@@ -5,7 +5,7 @@ using Unity.Collections;
 // Class to setup the MRT and setup and render to the appropriate targets.
 public class GeometryBuffer
 {
-    const string bufferName = "GeometryBuffers";
+    const string bufferName = "GeometryBuffer";
 
     ScriptableRenderContext context;
     Camera camera;
@@ -66,6 +66,7 @@ public class GeometryBuffer
 
         // Create a render texture to use as the depth buffer.
         depthBuffer = RenderTexture.GetTemporary(camera.pixelWidth, camera.pixelHeight, 24);
+
         buffer.SetRenderTarget(mrt, depthBuffer);
         buffer.ClearRenderTarget(true, true, Color.clear);
 
@@ -86,9 +87,10 @@ public class GeometryBuffer
         buffer.ReleaseTemporaryRT(normalBufferId);
         buffer.ReleaseTemporaryRT(albedoBufferId);
         buffer.ReleaseTemporaryRT(viewPositionBufferId);
-        RenderTexture.ReleaseTemporary(depthBuffer);
 
         ExecuteBuffer();
+
+        RenderTexture.ReleaseTemporary(depthBuffer);
     }
 }
 
@@ -99,7 +101,7 @@ public class SSAOBuffer
     Camera camera;
     Material material;
 
-    const string bufferName = "SSAOBuffers";
+    const string bufferName = "SSAOBuffer";
     CommandBuffer buffer = new CommandBuffer {name = bufferName};
 
     // Setup ID for the render target.
@@ -151,6 +153,7 @@ public class SSAOBuffer
     void Cleanup()
     {
         buffer.ReleaseTemporaryRT(ssaoBufferId);
+
         ExecuteBuffer();
     }
 }

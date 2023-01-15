@@ -2,7 +2,6 @@
 #define CUSTOM_SSAO_PASS_INCLUDED
 
 #include "../Auxiliary/Common.hlsl"
-#include "../Auxiliary/Lighting.hlsl"
 
 // This pass is to sample the textures and sample them to the part of a triangle.
 TEXTURE2D(_NormalBuffer);
@@ -14,15 +13,15 @@ SAMPLER(sampler_AlbedoBuffer);
 TEXTURE2D(_ViewPositionBuffer);
 SAMPLER(sampler_ViewPositionBuffer);
 
-struct vertexInput {
+struct vertexOutput {
 	float4 positionClipSpace : SV_POSITION;
-	float2 coordsUV : VAR_UV;
+	float2 coordsUV : VAR_SCREEN_UV;
 };
 
 // Assign the correct clip-space coordinates and UV coordinates to the rendered triangle.
-vertexInput SSAOPassVertex (uint vertexID : SV_VertexID) {
-	vertexInput output;
-
+vertexOutput SSAOPassVertex (uint vertexID : SV_VertexID) {
+	vertexOutput output;
+	
 	output.positionClipSpace = float4(
 		vertexID <= 1 ? -1.0 : 3.0,
 		vertexID == 1 ? 3.0 : -1.0,
@@ -36,12 +35,14 @@ vertexInput SSAOPassVertex (uint vertexID : SV_VertexID) {
 	return output;
 }
 
-float4 SSAOPassFragment(vertexInput input) : SV_TARGET
+float4 SSAOPassFragment(vertexOutput input) : SV_TARGET
 {
     float4 albedo = SAMPLE_TEXTURE2D(_AlbedoBuffer, sampler_AlbedoBuffer, input.coordsUV);
-	float4 color = float4(GetLighting(SAMPLE_TEXTURE2D(_NormalBuffer, sampler_NormalBuffer, input.coordsUV).xyz), 1.0f);
+	float4 normal = SAMPLE_TEXTURE2D(_NormalBuffer, sampler_NormalBuffer, input.coordsUV);
 
-    return float4(1.0f, 0.0f,0.0f, 1.0f);
+	return float4(1.0f, 0.0f,0.0f, 0.5f);
+
+    //return albedo;
 
     //return saturate(color * albedo);
 }
