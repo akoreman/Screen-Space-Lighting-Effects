@@ -42,7 +42,7 @@ float4 LitPassFragment(vertexOutput input) : SV_TARGET
 	float4 ssao = SAMPLE_TEXTURE2D(_SSAOBuffer, sampler__SSAOBuffer, input.coordsUV);
 	float4 color = float4(GetLighting(SAMPLE_TEXTURE2D(_NormalBuffer, sampler_NormalBuffer, input.coordsUV).xyz),1.0f);
 
-    return saturate(color * albedo) + ssao;
+    return saturate(color * albedo);
 }
 
 #endif

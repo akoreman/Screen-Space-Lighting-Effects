@@ -29,7 +29,7 @@ vertexOutput SSAOPassVertex (uint vertexID : SV_VertexID) {
 	);
 	output.coordsUV = float2(
 		vertexID <= 1 ? 0.0 : 2.0,
-		vertexID == 1 ? 2.0 : 0.0
+		vertexID == 1 ? -1.0 : 1.0
 	);
 
 	return output;
@@ -40,11 +40,9 @@ float4 SSAOPassFragment(vertexOutput input) : SV_TARGET
     float4 albedo = SAMPLE_TEXTURE2D(_AlbedoBuffer, sampler_AlbedoBuffer, input.coordsUV);
 	float4 normal = SAMPLE_TEXTURE2D(_NormalBuffer, sampler_NormalBuffer, input.coordsUV);
 
-	return float4(1.0f, 0.0f,0.0f, 0.5f);
+	//return float4(1.0f, 0.0f,0.0f, 0.5f);
 
-    //return albedo;
-
-    //return saturate(color * albedo);
+    return albedo;
 }
 
 #endif

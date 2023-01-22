@@ -100,18 +100,24 @@ public class SSAOBuffer
     ScriptableRenderContext context;
     Camera camera;
     Material material;
+    CullingResults cullingResults;
 
     const string bufferName = "SSAOBuffer";
     CommandBuffer buffer = new CommandBuffer {name = bufferName};
 
+
+    static ShaderTagId ssaoShaderTagId = new ShaderTagId("SSAO");
+
     // Setup ID for the render target.
     static int ssaoBufferId = Shader.PropertyToID("_SSAOBuffer");
 
-    public void Setup(ScriptableRenderContext context, Camera camera, Material material)
+    public void Setup(ScriptableRenderContext context, Camera camera, Material material, CullingResults cullingResults)
     {
         this.context = context;
         this.camera = camera;
         this.material = material;
+
+        this.cullingResults = cullingResults;
 
         Render();  
         Submit();
@@ -131,11 +137,22 @@ public class SSAOBuffer
 
         ExecuteBuffer();
 
+        // TO DO: fix this such that we don't need to render all meshes again to compose the 
+        // RT with SSAO data.
+        SortingSettings sortingSettings = new SortingSettings(camera);
+        DrawingSettings drawingSettings = new DrawingSettings(ssaoShaderTagId, sortingSettings);
+        FilteringSettings filteringSettings = new FilteringSettings(RenderQueueRange.all);
+
+        context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
+        context.Submit();
+
+        /*
         // Render a screen-space triangle using the SSAO pass of the deferred shader.
         buffer.DrawProcedural(
 			Matrix4x4.identity, material, 1,
 			MeshTopology.Triangles, 3
 		);
+        */
     }
 
     void Submit()
