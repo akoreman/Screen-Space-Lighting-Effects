@@ -2,6 +2,7 @@
 #define CUSTOM_SSAO_PASS_INCLUDED
 
 #include "../Auxiliary/Common.hlsl"
+#include "../Auxiliary/Random.hlsl"
 
 // This pass is to sample the textures and sample them to the part of a triangle.
 TEXTURE2D(_NormalBuffer);
@@ -42,7 +43,7 @@ float4 SSAOPassFragment(vertexOutput input) : SV_TARGET
 
 	//return float4(1.0f, 0.0f,0.0f, 0.5f);
 
-    return albedo;
+    return albedo + float4(RandomRange_float(input.coordsUV, 0.0, 1.0), RandomRange_float(input.coordsUV, 0.0, 1.0) ,RandomRange_float(input.coordsUV, 0.0, 1.0) ,RandomRange_float(input.coordsUV, 0.0, 1.0));
 }
 
 #endif
